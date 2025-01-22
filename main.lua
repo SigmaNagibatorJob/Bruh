@@ -8,8 +8,10 @@ local function createWindow(title)
     window.Size = UDim2.new(0, 400, 0, 300)
     window.Position = UDim2.new(0.5, -200, 0.5, -150)
     window.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
+    window.BackgroundTransparency = 0.5  -- Полупрозрачность
+    window.BorderSizePixel = 0  -- Без рамки
     window.Parent = screenGui
-    
+
     -- Заголовок окна
     local header = Instance.new("TextLabel")
     header.Size = UDim2.new(1, 0, 0, 40)
@@ -19,6 +21,31 @@ local function createWindow(title)
     header.TextSize = 20
     header.TextAlign = Enum.TextXAlignment.Center
     header.Parent = window
+
+    -- Перетаскивание окна
+    local dragging, dragInput, startPos, startDragPos
+
+    header.InputBegan:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 then
+            dragging = true
+            startPos = window.Position
+            startDragPos = input.Position
+            input.Consumed = true
+        end
+    end)
+
+    header.InputChanged:Connect(function(input)
+        if dragging and input.UserInputType == Enum.UserInputType.MouseMovement then
+            local delta = input.Position - startDragPos
+            window.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+        end
+    end)
+
+    header.InputEnded:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 then
+            dragging = false
+        end
+    end)
     
     return window
 end
@@ -29,10 +56,11 @@ local function createButton(parent, buttonText, position, size, callback)
     button.Position = position
     button.Text = buttonText
     button.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+    button.BackgroundTransparency = 0.5  -- Полупрозрачность
     button.TextColor3 = Color3.fromRGB(255, 255, 255)
     button.TextSize = 18
     button.Parent = parent
-    
+
     -- Обработчик клика
     button.MouseButton1Click:Connect(callback)
     
@@ -45,6 +73,7 @@ local function createToggleButton(parent, buttonText, position, size, callback)
     toggleButton.Position = position
     toggleButton.Text = buttonText
     toggleButton.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+    toggleButton.BackgroundTransparency = 0.5  -- Полупрозрачность
     toggleButton.TextColor3 = Color3.fromRGB(255, 255, 255)
     toggleButton.TextSize = 18
     toggleButton.Parent = parent
